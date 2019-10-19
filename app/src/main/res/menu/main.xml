@@ -3,21 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/miCopy"
-        android:icon="@drawable/ic_send_black_24dp"
-        android:title="Copy"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/miList"
         android:icon="@drawable/ic_list_black_24dp"
         android:title="List"
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/miCopy"
+        android:icon="@drawable/ic_send_black_24dp"
+        android:onClick="launchCopy"
+        android:title="Copy"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/miSettings"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="Settings"
         android:onClick="launchSettings"
+        android:title="Settings"
         app:showAsAction="ifRoom" />
 </menu>

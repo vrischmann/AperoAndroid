@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Apero</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="copy_content_hint">content to copy goes here</string>
 </resources>

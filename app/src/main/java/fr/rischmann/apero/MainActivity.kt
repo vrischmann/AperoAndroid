@@ -11,7 +11,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContentView(R.layout.activity_main)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -27,6 +26,15 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, SettingsFragment())
+            .addToBackStack("settings")
+            .commit()
+    }
+
+    fun launchCopy(item: MenuItem) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, CopyFragment())
+            .addToBackStack("copy")
             .commit()
     }
 }
@@ -35,5 +43,4 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
-
 }
