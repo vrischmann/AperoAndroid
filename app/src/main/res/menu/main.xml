@@ -18,5 +18,6 @@
         android:id="@+id/miSettings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="Settings"
+        android:onClick="launchSettings"
         app:showAsAction="ifRoom" />
 </menu>

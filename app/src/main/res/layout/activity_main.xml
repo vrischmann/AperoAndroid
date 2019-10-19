@@ -18,41 +18,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <Button
-        android:id="@+id/copyButton"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:text="Copy"
-        android:onClick="copy"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/pasteButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text" />
-
-    <Button
-        android:id="@+id/pasteButton"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:text="Paste"
-        android:onClick="paste"
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/copyButton"
-        app:layout_constraintTop_toBottomOf="@+id/text" />
-
-    <EditText
-        android:id="@+id/text"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:ems="10"
-        android:gravity="start|top"
-        android:hint="type your text here"
-        android:inputType="textMultiLine"
-        android:selectAllOnFocus="false"
-        app:layout_constraintBottom_toTopOf="@+id/copyButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+    </FrameLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
