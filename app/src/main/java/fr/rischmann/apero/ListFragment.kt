@@ -38,7 +38,7 @@ class ListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ItemRecyclerViewAdapter(
+                adapter = ListItemRecyclerViewAdapter(
                     listOf(
                         ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom())),
                         ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()))

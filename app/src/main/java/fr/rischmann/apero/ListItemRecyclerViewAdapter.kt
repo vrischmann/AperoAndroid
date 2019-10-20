@@ -14,10 +14,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class ItemRecyclerViewAdapter(
+class ListItemRecyclerViewAdapter(
     private val mValues: List<ListItem>,
     private val mListener: OnListFragmentInteractionListener?
-) : RecyclerView.Adapter<ItemRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
 
@@ -38,6 +38,8 @@ class ItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
+
+        holder.mIDView.text = item.id.toString()
         holder.mTimeView.text = formattedULIDTime(item.id)
 
         with(holder.mView) {
@@ -49,6 +51,7 @@ class ItemRecyclerViewAdapter(
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
+        val mIDView: TextView = mView.item_id
         val mTimeView: TextView = mView.item_time
         val mPasteButton: ImageButton = mView.item_paste
     }

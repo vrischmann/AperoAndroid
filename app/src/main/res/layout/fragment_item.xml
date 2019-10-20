@@ -9,16 +9,32 @@
     android:minHeight="70dp">
 
     <TextView
+        android:id="@+id/item_id"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:width="20dp"
+        android:height="20dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toTopOf="@id/item_time"
+        app:layout_constraintEnd_toStartOf="@id/item_move"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="entry id" />
+
+    <TextView
         android:id="@+id/item_time"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:width="20dp"
+        android:height="20dp"
         android:gravity="center_vertical"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_move"
+        app:layout_constraintEnd_toStartOf="@id/item_move"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="test" />
+        app:layout_constraintTop_toBottomOf="@id/item_id"
+        tools:text="entry time" />
 
     <ImageButton
         android:id="@+id/item_move"
@@ -28,7 +44,7 @@
         android:src="@drawable/ic_content_cut_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/item_paste"
-        app:layout_constraintStart_toEndOf="@id/item_time"
+        app:layout_constraintStart_toEndOf="@id/item_id"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
