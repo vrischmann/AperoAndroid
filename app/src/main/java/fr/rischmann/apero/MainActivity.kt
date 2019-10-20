@@ -5,15 +5,24 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
+import fr.rischmann.apero.dummy.DummyContent
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteractionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
+        val navController = findNavController(R.id.nav_host_fragment)
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
         setSupportActionBar(toolbar)
     }
 
@@ -22,20 +31,13 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun launchSettings(item: MenuItem) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, SettingsFragment())
-            .addToBackStack("settings")
-            .commit()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment)
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
-    fun launchCopy(item: MenuItem) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, CopyFragment())
-            .addToBackStack("copy")
-            .commit()
+    override fun onListFragmentInteraction(item: DummyContent.DummyItem?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
