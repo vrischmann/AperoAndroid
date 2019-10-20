@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import java.security.SecureRandom
 import java.time.Instant
 
-class ListFragment : Fragment() {
+class EntryListFragment : Fragment() {
     private var moveListener: OnListItemMove? = null
     private var pasteListener: OnListItemPaste? = null
 
-    private var items: List<ListItem> = emptyList()
+    private var items: List<Entry> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +31,10 @@ class ListFragment : Fragment() {
         if (view is RecyclerView) {
             with(view) {
                 layoutManager = LinearLayoutManager(context)
-                adapter = ListItemRecyclerViewAdapter(
+                adapter = EntryListRecyclerViewAdapter(
                     listOf(
-                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "foo"),
-                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "bar")
+                        Entry(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "foo"),
+                        Entry(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "bar")
                     ),
                     moveListener,
                     pasteListener
@@ -65,10 +65,10 @@ class ListFragment : Fragment() {
     }
 
     interface OnListItemMove {
-        fun onListItemMove(item: ListItem?)
+        fun onListItemMove(item: Entry?)
     }
 
     interface OnListItemPaste {
-        fun onListItemPaste(item: ListItem?)
+        fun onListItemPaste(item: Entry?)
     }
 }

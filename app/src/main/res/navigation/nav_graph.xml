@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/miListFragment"
-        android:name="fr.rischmann.apero.ListFragment"
+        android:name="fr.rischmann.apero.EntryListFragment"
         android:label="List"
         tools:layout="@layout/fragment_item_list">
         <action

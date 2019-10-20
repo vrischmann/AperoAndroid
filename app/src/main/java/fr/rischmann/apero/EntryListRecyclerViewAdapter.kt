@@ -13,11 +13,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class ListItemRecyclerViewAdapter(
-    private val mValues: List<ListItem>,
-    private val moveListener: ListFragment.OnListItemMove?,
-    private val pasteListener: ListFragment.OnListItemPaste?
-) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
+class EntryListRecyclerViewAdapter(
+    private val mValues: List<Entry>,
+    private val moveListener: EntryListFragment.OnListItemMove?,
+    private val pasteListener: EntryListFragment.OnListItemPaste?
+) : RecyclerView.Adapter<EntryListRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)

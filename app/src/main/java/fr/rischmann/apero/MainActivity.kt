@@ -13,8 +13,8 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
 import fr.rischmann.apero.Logging.TAG
 
-class MainActivity : AppCompatActivity(), ListFragment.OnListItemMove,
-    ListFragment.OnListItemPaste {
+class MainActivity : AppCompatActivity(), EntryListFragment.OnListItemMove,
+    EntryListFragment.OnListItemPaste {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +39,11 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListItemMove,
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
-    override fun onListItemMove(item: ListItem?) {
+    override fun onListItemMove(item: Entry?) {
         Log.i(TAG, "move item $item")
     }
 
-    override fun onListItemPaste(item: ListItem?) {
+    override fun onListItemPaste(item: Entry?) {
         Log.i(TAG, "paste item $item")
     }
 
