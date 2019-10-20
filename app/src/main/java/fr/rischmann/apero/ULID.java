@@ -1,5 +1,7 @@
 package fr.rischmann.apero;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -12,7 +14,7 @@ public class ULID {
     }
 
     public long timestamp() {
-        long l = data[5];
+        long l = data[5] & 0xFF;
         long l1 = ((long) data[4] & 0xFF) << 8;
         long l2 = ((long) data[3] & 0xFF) << 16;
         long l3 = ((long) data[2] & 0xFF) << 24;
@@ -21,13 +23,13 @@ public class ULID {
         return l | l1 | l2 | l3 | l4 | l5;
     }
 
-    public void setTime(long ms) {
-        data[0] = (byte) ((ms) >> 40);
-        data[1] = (byte) ((ms) >> 32);
-        data[2] = (byte) ((ms) >> 24);
-        data[3] = (byte) ((ms) >> 16);
-        data[4] = (byte) ((ms) >> 8);
-        data[5] = (byte) ((ms));
+    private void setTimestamp(long ms) {
+        data[0] = (byte) ((ms >> 40) & 0xFF);
+        data[1] = (byte) ((ms >> 32) & 0xFF);
+        data[2] = (byte) ((ms >> 24) & 0xFF);
+        data[3] = (byte) ((ms >> 16) & 0xFF);
+        data[4] = (byte) ((ms >> 8) & 0xFF);
+        data[5] = (byte) (ms & 0xFF);
     }
 
     @Override
@@ -43,6 +45,7 @@ public class ULID {
         return Arrays.hashCode(data);
     }
 
+    @NotNull
     @Override
     public String toString() {
         byte[] dst = new byte[ENCODED_SIZE];
@@ -124,7 +127,7 @@ public class ULID {
         random.nextBytes(randomBytes);
 
         ULID id = new ULID();
-        id.setTime(timestamp);
+        id.setTimestamp(timestamp);
         id.setRandom(randomBytes);
 
         return id;

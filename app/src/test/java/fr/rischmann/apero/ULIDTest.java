@@ -32,6 +32,7 @@ public class ULIDTest {
 
         ULID id = ULID.random(timestamp, new SecureRandom());
         assertNotNull(id);
+        assertEquals(timestamp, id.timestamp());
 
         String s = id.toString();
         assertEquals(ULID.ENCODED_SIZE, s.length());
@@ -40,6 +41,6 @@ public class ULIDTest {
         assertEquals(id2, id);
 
         Instant time2 = Instant.ofEpochMilli(id.timestamp());
-        assertEquals(time2, time);
+        assertEquals(time, time2);
     }
 }
