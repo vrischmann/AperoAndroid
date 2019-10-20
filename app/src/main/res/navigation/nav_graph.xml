@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/miListFragment">
+
+    <fragment
+        android:id="@+id/miListFragment"
+        android:name="fr.rischmann.apero.EntryListFragment"
+        android:label="List"
+        tools:layout="@layout/fragment_item_list">
+        <action
+            android:id="@+id/action_listFragment_to_miSettingsFragment"
+            app:destination="@id/miSettingsFragment" />
+        <action
+            android:id="@+id/action_miListFragment_to_copyFragment"
+            app:destination="@id/miCopyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/miSettingsFragment"
+        android:name="fr.rischmann.apero.SettingsFragment"
+        android:label="Settings" />
+    <fragment
+        android:id="@+id/miCopyFragment"
+        android:name="fr.rischmann.apero.CopyFragment"
+        android:label="Copy"
+        tools:layout="@layout/fragment_copy" />
+</navigation>

@@ -15,7 +15,7 @@ class TypesTest {
         val content = Base64.getDecoder()
             .decode("Y4UrYkVGJwJev1hIzgtfFKohhcp1aUyUMUk5cRLpcNNJT9gv8hK3a1AhdHSD")
 
-        val req = Types.CopyRequest(signature, content)
+        val req = Types.CopyRequest(Signature(signature), content)
 
         val s = mapper.writeValueAsString(req)
 
