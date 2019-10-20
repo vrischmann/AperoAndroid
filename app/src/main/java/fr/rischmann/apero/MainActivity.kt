@@ -21,8 +21,8 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteraction
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setupWithNavController(navController, appBarConfiguration)
         setSupportActionBar(toolbar)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
