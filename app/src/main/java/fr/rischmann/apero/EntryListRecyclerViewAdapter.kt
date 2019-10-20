@@ -14,10 +14,11 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 class EntryListRecyclerViewAdapter(
-    private val mValues: List<Entry>,
     private val moveListener: EntryListFragment.OnListItemMove?,
     private val pasteListener: EntryListFragment.OnListItemPaste?
 ) : RecyclerView.Adapter<EntryListRecyclerViewAdapter.ViewHolder>() {
+
+    private var _values = listOf<Entry>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -25,8 +26,13 @@ class EntryListRecyclerViewAdapter(
         return ViewHolder(view)
     }
 
+    fun setData(values: List<Entry>) {
+        _values = values
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = mValues[position]
+        val item = _values[position]
 
         holder.mIDView.text = item.id.toString()
         holder.mTimeView.text = formattedULIDTime(item.id)
@@ -43,7 +49,7 @@ class EntryListRecyclerViewAdapter(
         }
     }
 
-    override fun getItemCount(): Int = mValues.size
+    override fun getItemCount(): Int = _values.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mIDView: TextView = mView.item_id

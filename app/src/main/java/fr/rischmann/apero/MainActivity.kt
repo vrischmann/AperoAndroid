@@ -6,6 +6,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
@@ -16,8 +18,15 @@ import fr.rischmann.apero.Logging.TAG
 class MainActivity : AppCompatActivity(), EntryListFragment.OnListItemMove,
     EntryListFragment.OnListItemPaste {
 
+    private lateinit var _vm: EntryViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        _vm = ViewModelProviders.of(this)[EntryViewModel::class.java]
+        _vm.getEntries().observe(this, Observer {
+            Log.i(TAG, "loaded entries: $it")
+        })
 
         setContentView(R.layout.activity_main)
 
@@ -40,11 +49,25 @@ class MainActivity : AppCompatActivity(), EntryListFragment.OnListItemMove,
     }
 
     override fun onListItemMove(item: Entry?) {
+        if (item == null) {
+            return
+        }
+
         Log.i(TAG, "move item $item")
+
+        // TODO(vincent): do move on the server via API call
+
+        _vm.removeEntry(item)
     }
 
     override fun onListItemPaste(item: Entry?) {
+        if (item == null) {
+            return
+        }
+
         Log.i(TAG, "paste item $item")
+
+        // TODO(vincent): do paste on the server via API call
     }
 
 }
