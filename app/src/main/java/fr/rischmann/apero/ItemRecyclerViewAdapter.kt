@@ -4,7 +4,6 @@ package fr.rischmann.apero
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -39,7 +38,7 @@ class ItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mTimeView.text = formattedIDTime(item.id)
+        holder.mTimeView.text = formattedULIDTime(item.id)
 
         with(holder.mView) {
             tag = item
@@ -58,7 +57,7 @@ class ItemRecyclerViewAdapter(
         private val dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
             .withZone(ZoneId.systemDefault())
 
-        private fun formattedIDTime(id: ID): String {
+        private fun formattedULIDTime(id: ULID): String {
             val instant = Instant.ofEpochMilli(id.timestamp())
             return dateTimeFormatter.format(instant)
         }

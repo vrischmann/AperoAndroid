@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.security.SecureRandom
+import java.time.Instant
 
 class ListFragment : Fragment() {
     private var columnCount = 1
@@ -38,8 +40,8 @@ class ListFragment : Fragment() {
                 }
                 adapter = ItemRecyclerViewAdapter(
                     listOf(
-                        ListItem(ID.random()),
-                        ListItem(ID.random())
+                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom())),
+                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()))
                     ), listener
                 )
             }

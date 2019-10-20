@@ -1,6 +1,7 @@
 package fr.rischmann.apero
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +13,11 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
 
 class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteractionListener {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        d("foobar")
 
         setContentView(R.layout.activity_main)
 
@@ -36,7 +40,13 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteraction
     }
 
     override fun onListFragmentInteraction(item: ListItem?) {
-        println(item)
+        d("item: $item")
+    }
+
+    companion object {
+        fun d(msg: String) {
+            Log.d("Apero", msg)
+        }
     }
 }
 
