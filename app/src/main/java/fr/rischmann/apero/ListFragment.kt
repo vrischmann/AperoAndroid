@@ -2,16 +2,13 @@ package fr.rischmann.apero
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-
-import fr.rischmann.apero.dummy.DummyContent
-import fr.rischmann.apero.dummy.DummyContent.DummyItem
 
 class ListFragment : Fragment() {
     private var columnCount = 1
@@ -39,7 +36,7 @@ class ListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ItemRecyclerViewAdapter(DummyContent.ITEMS, listener)
+                adapter = ItemRecyclerViewAdapter(emptyList(), listener)
             }
         }
         return view
@@ -71,8 +68,7 @@ class ListFragment : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: DummyItem?)
+        fun onListFragmentInteraction(item: ListItem?)
     }
 
     companion object {

@@ -10,7 +10,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
-import fr.rischmann.apero.dummy.DummyContent
 
 class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteractionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteraction
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
-    override fun onListFragmentInteraction(item: DummyContent.DummyItem?) {
+    override fun onListFragmentInteraction(item: ListItem?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
