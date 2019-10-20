@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.time.Instant
 
 class ListFragment : Fragment() {
     private var columnCount = 1
@@ -36,7 +37,12 @@ class ListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ItemRecyclerViewAdapter(emptyList(), listener)
+                adapter = ItemRecyclerViewAdapter(
+                    listOf(
+                        ListItem(ID.random()),
+                        ListItem(ID.random())
+                    ), listener
+                )
             }
         }
         return view

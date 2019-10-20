@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteraction
     }
 
     override fun onListFragmentInteraction(item: ListItem?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        println(item)
     }
 }
 

@@ -4,11 +4,16 @@ package fr.rischmann.apero
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import fr.rischmann.apero.ListFragment.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.fragment_item.view.*
+import java.time.Instant
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 class ItemRecyclerViewAdapter(
     private val mValues: List<ListItem>,
@@ -34,8 +39,7 @@ class ItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mTimeView.text = DateTimeFormatter.ISO_DATE_TIME.format(item.time)
-        holder.mContentView.text = item.content
+        holder.mTimeView.text = formattedIDTime(item.id)
 
         with(holder.mView) {
             tag = item
@@ -47,10 +51,16 @@ class ItemRecyclerViewAdapter(
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mTimeView: TextView = mView.item_time
-        val mContentView: TextView = mView.item_content
+        val mPasteButton: ImageButton = mView.item_paste
+    }
 
-        override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+    companion object {
+        private val dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+            .withZone(ZoneId.systemDefault())
+
+        private fun formattedIDTime(id: ID): String {
+            val instant = Instant.ofEpochMilli(id.timestamp())
+            return dateTimeFormatter.format(instant)
         }
     }
 }
