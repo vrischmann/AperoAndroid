@@ -1,6 +1,6 @@
 package fr.rischmann.apero
 
-data class ListItem(val id: ULID)
+data class ListItem(val id: ULID, val content: String)
 
 data class Signature(private val data: ByteArray) {
     override fun equals(other: Any?): Boolean {
