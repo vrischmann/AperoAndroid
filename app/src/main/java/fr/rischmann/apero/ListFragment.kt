@@ -15,6 +15,8 @@ class ListFragment : Fragment() {
     private var moveListener: OnListItemMove? = null
     private var pasteListener: OnListItemPaste? = null
 
+    private var items: List<ListItem> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -31,9 +33,11 @@ class ListFragment : Fragment() {
                 layoutManager = LinearLayoutManager(context)
                 adapter = ListItemRecyclerViewAdapter(
                     listOf(
-                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom())),
-                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()))
-                    ), moveListener, pasteListener
+                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "foo"),
+                        ListItem(ULID.random(Instant.now().toEpochMilli(), SecureRandom()), "bar")
+                    ),
+                    moveListener,
+                    pasteListener
                 )
             }
         }
