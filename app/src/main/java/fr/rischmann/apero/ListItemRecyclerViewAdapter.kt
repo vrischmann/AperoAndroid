@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import fr.rischmann.apero.ListFragment.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.fragment_item.view.*
 import java.time.Instant
 import java.time.ZoneId
@@ -16,19 +15,9 @@ import java.time.format.FormatStyle
 
 class ListItemRecyclerViewAdapter(
     private val mValues: List<ListItem>,
-    private val mListener: OnListFragmentInteractionListener?
+    private val moveListener: ListFragment.OnListItemMove?,
+    private val pasteListener: ListFragment.OnListItemPaste?
 ) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
-
-    private val mOnClickListener: View.OnClickListener
-
-    init {
-        mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as ListItem
-            // Notify the active callbacks interface (the activity, if the fragment is attached to
-            // one) that an item has been selected.
-            mListener?.onListFragmentInteraction(item)
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -42,9 +31,15 @@ class ListItemRecyclerViewAdapter(
         holder.mIDView.text = item.id.toString()
         holder.mTimeView.text = formattedULIDTime(item.id)
 
-        with(holder.mView) {
-            tag = item
-            setOnClickListener(mOnClickListener)
+        with(holder.mMoveButton) {
+            setOnClickListener {
+                moveListener?.onListItemMove(item)
+            }
+        }
+        with(holder.mPasteButton) {
+            setOnClickListener {
+                pasteListener?.onListItemPaste(item)
+            }
         }
     }
 
@@ -53,6 +48,7 @@ class ListItemRecyclerViewAdapter(
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mIDView: TextView = mView.item_id
         val mTimeView: TextView = mView.item_time
+        val mMoveButton: ImageButton = mView.item_move
         val mPasteButton: ImageButton = mView.item_paste
     }
 

@@ -11,13 +11,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
+import fr.rischmann.apero.Logging.TAG
 
-class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), ListFragment.OnListItemMove,
+    ListFragment.OnListItemPaste {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        d("foobar")
 
         setContentView(R.layout.activity_main)
 
@@ -39,15 +39,18 @@ class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteraction
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
-    override fun onListFragmentInteraction(item: ListItem?) {
-        d("item: $item")
+    override fun onListItemMove(item: ListItem?) {
+        Log.i(TAG, "move item $item")
     }
 
-    companion object {
-        fun d(msg: String) {
-            Log.d("Apero", msg)
-        }
+    override fun onListItemPaste(item: ListItem?) {
+        Log.i(TAG, "paste item $item")
     }
+
+}
+
+object Logging {
+    const val TAG = "Apero"
 }
 
 class SettingsFragment : PreferenceFragmentCompat() {
