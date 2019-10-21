@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_computer_black_24dp"
+        app:key="endpoint"
+        app:summary="Endpoint of the Apero server"
+        app:title="Endpoint" />
+
+    <EditTextPreference
+        app:icon="@drawable/ic_vpn_key_black_24dp"
+        app:key="psKey"
+        app:summary="Pre-shared key to authenticate with the server"
+        app:title="Pre-shared key" />
+
+    <EditTextPreference
+        app:icon="@drawable/ic_vpn_key_black_24dp"
+        app:key="encryptKey"
+        app:summary="Encryption key for the content"
+        app:title="E2E encryption key" />
+
+    <EditTextPreference
+        app:icon="@drawable/ic_vpn_key_black_24dp"
+        app:key="signPrivateKey"
+        app:summary="Private key to sign the requests"
+        app:title="Private key" />
+
+    <EditTextPreference
+        app:icon="@drawable/ic_vpn_key_black_24dp"
+        app:key="signPublicKey"
+        app:summary="Public key to verify the requests"
+        app:title="Public key" />
+
+</PreferenceScreen>
