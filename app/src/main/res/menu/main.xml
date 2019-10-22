@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/miListFragment"
+        android:id="@id/menuItemListFragment"
         android:icon="@drawable/ic_list_black_24dp"
         android:title="List"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@id/miCopyFragment"
+        android:id="@id/menuItemCopyFragment"
         android:icon="@drawable/ic_send_black_24dp"
         android:title="Copy"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@id/miSettingsFragment"
+        android:id="@id/menuItemSettingsFragment"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="Settings"
         app:showAsAction="ifRoom" />
