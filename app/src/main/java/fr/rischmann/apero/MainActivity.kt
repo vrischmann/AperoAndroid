@@ -16,6 +16,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.rischmann.apero.Logging.TAG
@@ -174,7 +175,19 @@ object Logging {
 }
 
 class SettingsFragment : PreferenceFragmentCompat() {
+    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
+        preference?.let {
+            if (it.key == "readQRCode") {
+                view?.findNavController()?.navigate(R.id.action_settingsFragment_to_settingsQRCameraFragment)
+                return true
+            }
+        }
+
+        return super.onPreferenceTreeClick(preference)
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        Log.i(TAG, "creating preferences")
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 }
