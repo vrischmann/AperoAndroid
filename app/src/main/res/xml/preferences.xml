@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:summary="Read settings from a QR Code"
+        app:icon="@drawable/ic_camera_alt_black_24dp"
+        app:key="readQRCode"
+        app:title="QR Code" />
 
     <EditTextPreference
         app:icon="@drawable/ic_computer_black_24dp"
