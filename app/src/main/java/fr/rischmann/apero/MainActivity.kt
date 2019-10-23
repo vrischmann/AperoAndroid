@@ -16,7 +16,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.rischmann.apero.Logging.TAG
 import fr.rischmann.ulid.ULID
@@ -38,9 +37,12 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.registerOnSharedPreferenceChangeListener(this)
+
         //
 
-        recreateClient()
+        recreateClient(prefs)
         recreateVM()
 
         //
@@ -63,7 +65,8 @@ class MainActivity : AppCompatActivity(),
     override fun onResume() {
         super.onResume()
 
-        recreateClient()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        recreateClient(prefs)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -99,11 +102,14 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun recreateClient() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        prefs.registerOnSharedPreferenceChangeListener(this)
+    private fun recreateClient(preferences: SharedPreferences) {
+        val endpoint = preferences.string("endpoint")
+        if (endpoint.isEmpty()) {
+            return
+        }
+
         // Try to create the client based on old preferences
-        _client = clientFromPrefs(prefs)
+        _client = clientFromPrefs(preferences, endpoint)
     }
 
     private fun recreateVM() {
@@ -129,29 +135,29 @@ class MainActivity : AppCompatActivity(),
         clipboard.setPrimaryClip(clipData)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        sharedPreferences?.let {
-            Log.d(TAG, "preferences changed")
-            _client = clientFromPrefs(it)
+    override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String) {
+        val endpoint = preferences.string("endpoint")
+        if (endpoint.isEmpty()) {
+            _client = EntryRepository.dummy()
+            return
         }
+
+        // The user wants to fetch the credentials from the server
+        if (key == "provision") {
+            // TODO
+        }
+
+        Log.d(TAG, "preferences changed")
+        _client = clientFromPrefs(preferences, endpoint)
     }
 
-    private fun clientFromPrefs(p: SharedPreferences): EntryRepository {
-        val endpoint = p.getString("endpoint", "").orEmpty()
-        if (endpoint.isEmpty()) {
-            return EntryRepository.dummy()
-        }
-
-        fun g(key: String): String? {
-            return p.getString(key, "")
-        }
-
-        val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
-        val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
-        val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
+    private fun clientFromPrefs(p: SharedPreferences, endpoint: String): EntryRepository {
+        val psKey = p.string("psKey").let(::fromB64) ?: byteArrayOf()
+        val encryptKey = p.string("encryptKey").let(::fromB64) ?: byteArrayOf()
+        val signPublicKey = p.string("signPublicKey").let(::fromB64) ?: byteArrayOf()
         // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
         // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-        val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
+        val signPrivateKey = p.string("signPrivateKey").let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
 
         _credentials = Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         if (!_credentials.isValid()) {
@@ -164,6 +170,10 @@ class MainActivity : AppCompatActivity(),
     }
 }
 
+private fun SharedPreferences.string(key: String): String {
+    return getString(key, "").orEmpty()
+}
+
 private fun fromB64(s: String): ByteArray? {
     if (s.isEmpty()) {
         return null
@@ -173,10 +183,4 @@ private fun fromB64(s: String): ByteArray? {
 
 object Logging {
     const val TAG = "Apero"
-}
-
-class SettingsFragment : PreferenceFragmentCompat() {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences, rootKey)
-    }
 }
