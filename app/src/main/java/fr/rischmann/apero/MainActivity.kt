@@ -20,6 +20,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.rischmann.apero.Logging.TAG
 import fr.rischmann.ulid.ULID
+import okhttp3.OkHttpClient
 import java.nio.charset.Charset
 import java.util.*
 
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity(),
     EntryListFragment.OnListItemPaste,
     SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private val _httpClient = OkHttpClient()
     private lateinit var _vm: EntryViewModel
 
     private lateinit var _credentials: Credentials
@@ -158,7 +160,7 @@ class MainActivity : AppCompatActivity(),
 
         Log.i(TAG, "creating client to $endpoint")
 
-        return EntryRepository.real(endpoint, _credentials)
+        return EntryRepository.real(_httpClient, endpoint, _credentials)
     }
 }
 

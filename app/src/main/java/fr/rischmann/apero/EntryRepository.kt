@@ -29,8 +29,8 @@ interface EntryRepository {
     fun pasteEntry(entry: Entry): CompletableFuture<ByteArray>
 
     companion object {
-        fun real(endpoint: String, credentials: Credentials): EntryRepository {
-            return RealEntryRepository(endpoint, credentials)
+        fun real(client: OkHttpClient, endpoint: String, credentials: Credentials): EntryRepository {
+            return RealEntryRepository(client, endpoint, credentials)
         }
 
         fun dummy(): EntryRepository {
@@ -58,9 +58,7 @@ private class DummyEntryRepository : EntryRepository {
 }
 
 
-private class RealEntryRepository(private val endpoint: String, val credentials: Credentials) : EntryRepository {
-    val client = OkHttpClient()
-
+private class RealEntryRepository(private val client: OkHttpClient, private val endpoint: String, val credentials: Credentials) : EntryRepository {
     override fun getEntries(): LiveData<Entries> {
         Log.d(TAG, "loading entries from $endpoint")
 
