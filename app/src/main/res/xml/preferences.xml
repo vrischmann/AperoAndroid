@@ -8,27 +8,40 @@
         app:title="Endpoint" />
 
     <EditTextPreference
-        app:icon="@drawable/ic_vpn_key_black_24dp"
-        app:key="psKey"
-        app:summary="Pre-shared key to authenticate with the server"
-        app:title="Pre-shared key" />
+        app:icon="@drawable/ic_settings_black_24dp"
+        app:key="provision"
+        app:summary="Let the server setup your device"
+        app:title="Provisioning" />
 
-    <EditTextPreference
-        app:icon="@drawable/ic_vpn_key_black_24dp"
-        app:key="encryptKey"
-        app:summary="Encryption key for the content"
-        app:title="E2E encryption key" />
+    <PreferenceCategory
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="Keys">
 
-    <EditTextPreference
-        app:icon="@drawable/ic_vpn_key_black_24dp"
-        app:key="signPrivateKey"
-        app:summary="Private key to sign the requests"
-        app:title="Private key" />
+        <EditTextPreference
+            app:icon="@drawable/ic_vpn_key_black_24dp"
+            app:key="psKey"
+            app:summary="Pre-shared key to authenticate with the server"
+            app:title="Pre-shared key" />
 
-    <EditTextPreference
-        app:icon="@drawable/ic_vpn_key_black_24dp"
-        app:key="signPublicKey"
-        app:summary="Public key to verify the requests"
-        app:title="Public key" />
+        <EditTextPreference
+            app:icon="@drawable/ic_vpn_key_black_24dp"
+            app:key="encryptKey"
+            app:summary="Encryption key for the content"
+            app:title="E2E encryption key" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_vpn_key_black_24dp"
+            app:key="signPrivateKey"
+            app:summary="Private key to sign the requests"
+            app:title="Private key" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_vpn_key_black_24dp"
+            app:key="signPublicKey"
+            app:summary="Public key to verify the requests"
+            app:title="Public key" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
