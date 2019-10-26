@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">Apero</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Apéro</string>
     <string name="copy_content_hint">content to copy goes here</string>
     <string name="paste_content_button">Paste</string>
     <string name="move_content_button">Move</string>
+    <string name="paste_encryption_undefined">You need to set the encryption key to paste an item</string>
+    <string name="move_encryption_key_undefined">You need to set the encryption key to move an item</string>
 </resources>

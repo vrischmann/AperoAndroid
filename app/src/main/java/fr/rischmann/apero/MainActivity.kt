@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -72,7 +73,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListItemMove(item: Entry?) {
-        if (item == null || _encryptKey.isEmpty()) {
+        if (item == null) {
+            return
+        }
+        if (_encryptKey.isEmpty()) {
+            Log.i(TAG, "encryption key is not defined")
+            Toast.makeText(applicationContext, getString(R.string.move_encryption_key_undefined), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -86,7 +92,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListItemPaste(item: Entry?) {
-        if (item == null || _encryptKey.isEmpty()) {
+        if (item == null) {
+            return
+        }
+        if (_encryptKey.isEmpty()) {
+            Log.i(TAG, "encryption key is not defined")
+            Toast.makeText(applicationContext, getString(R.string.paste_encryption_undefined), Toast.LENGTH_LONG).show()
             return
         }
 
