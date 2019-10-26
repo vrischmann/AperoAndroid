@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity(),
     private lateinit var _vm: EntryViewModel
 
     private lateinit var _credentials: Credentials
-    private var _client = EntryRepository.dummy()
+
+    private var _client = AperoClient.dummy()
+    private var _repository = EntryRepository.dummy()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,11 +103,11 @@ class MainActivity : AppCompatActivity(),
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
         // Try to create the client based on old preferences
-        _client = clientFromPrefs(prefs)
+        _repository = repositoryFromPrefs(prefs)
     }
 
     private fun recreateVM() {
-        val vmFactory = EntryViewModelFactory(_client)
+        val vmFactory = EntryViewModelFactory(_repository)
         _vm = ViewModelProviders.of(this, vmFactory)[EntryViewModel::class.java]
         _vm.entries.observe(this, Observer {
             Log.d(TAG, "loaded entries: $it")
@@ -130,11 +132,11 @@ class MainActivity : AppCompatActivity(),
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         sharedPreferences?.let {
             Log.d(TAG, "preferences changed")
-            _client = clientFromPrefs(it)
+            _repository = repositoryFromPrefs(it)
         }
     }
 
-    private fun clientFromPrefs(p: SharedPreferences): EntryRepository {
+    private fun repositoryFromPrefs(p: SharedPreferences): EntryRepository {
         val endpoint = p.getString("endpoint", "").orEmpty()
         if (endpoint.isEmpty()) {
             return EntryRepository.dummy()
@@ -158,7 +160,9 @@ class MainActivity : AppCompatActivity(),
 
         Log.i(TAG, "creating client to $endpoint")
 
-        return EntryRepository.real(endpoint, _credentials)
+        _client = AperoClient.real(endpoint, _credentials)
+
+        return EntryRepository.real(_client)
     }
 }
 
