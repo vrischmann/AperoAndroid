@@ -1,9 +1,7 @@
 package fr.rischmann.apero
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import fr.rischmann.apero.Logging.TAG
 import java.util.concurrent.CompletableFuture
 
 // TODO(vincent): error handling and shit
@@ -29,31 +27,8 @@ interface EntryRepository {
         fun real(client: AperoClient): EntryRepository {
             return RealEntryRepository(client)
         }
-
-        fun dummy(): EntryRepository {
-            return DummyEntryRepository()
-        }
     }
 }
-
-private class DummyEntryRepository : EntryRepository {
-    override fun getEntries(): LiveData<Entries> {
-        Log.d(TAG, "dummy repository: get entries")
-        return MutableLiveData(emptyList())
-    }
-
-    override fun moveEntry(entry: Entry): CompletableFuture<ByteArray> {
-        Log.d(TAG, "dummy repository: move entry")
-        return CompletableFuture.completedFuture(byteArrayOf())
-    }
-
-    override fun pasteEntry(entry: Entry): CompletableFuture<ByteArray> {
-        Log.d(TAG, "dummy repository: paste entry")
-        return CompletableFuture.completedFuture(byteArrayOf())
-    }
-
-}
-
 
 private class RealEntryRepository(private val client: AperoClient) : EntryRepository {
     override fun getEntries(): LiveData<Entries> {

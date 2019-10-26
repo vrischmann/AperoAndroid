@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var _credentials: Credentials
 
     private var _client = AperoClient.dummy()
-    private var _repository = EntryRepository.dummy()
+    private var _repository = EntryRepository.real(_client)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,8 +102,10 @@ class MainActivity : AppCompatActivity(),
     private fun recreateClient() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
+
         // Try to create the client based on old preferences
-        _repository = repositoryFromPrefs(prefs)
+        createClientFromPrefs(prefs)
+        createRepository()
     }
 
     private fun recreateVM() {
@@ -132,37 +134,50 @@ class MainActivity : AppCompatActivity(),
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         sharedPreferences?.let {
             Log.d(TAG, "preferences changed")
-            _repository = repositoryFromPrefs(it)
+            createClientFromPrefs(it)
+            createRepository()
         }
     }
 
-    private fun repositoryFromPrefs(p: SharedPreferences): EntryRepository {
+    private fun createClientFromPrefs(p: SharedPreferences) {
         val endpoint = p.getString("endpoint", "").orEmpty()
         if (endpoint.isEmpty()) {
-            return EntryRepository.dummy()
-        }
-
-        fun g(key: String): String? {
-            return p.getString(key, "")
-        }
-
-        val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
-        val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
-        val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
-        // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
-        // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-        val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
-
-        _credentials = Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
-        if (!_credentials.isValid()) {
-            return EntryRepository.dummy()
+            _client = AperoClient.dummy()
+            return
         }
 
         Log.i(TAG, "creating client to $endpoint")
 
-        _client = AperoClient.real(endpoint, _credentials)
+        when (BuildConfig.DEBUG) {
+            true -> {
 
-        return EntryRepository.real(_client)
+                _client = AperoClient.dummy()
+
+            }
+
+            false -> {
+                fun g(key: String): String? {
+                    return p.getString(key, "")
+                }
+
+                val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
+                val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
+                val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
+                // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
+                // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
+                val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
+
+                _credentials = Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
+                if (!_credentials.isValid()) {
+                    _client = AperoClient.dummy()
+                    return
+                }
+            }
+        }
+    }
+
+    private fun createRepository() {
+        _repository = EntryRepository.real(_client)
     }
 }
 
