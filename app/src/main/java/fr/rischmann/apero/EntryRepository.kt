@@ -1,7 +1,9 @@
 package fr.rischmann.apero
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import fr.rischmann.apero.Logging.TAG
 import java.util.concurrent.CompletableFuture
 
 // TODO(vincent): error handling and shit
@@ -36,7 +38,10 @@ private class RealEntryRepository(private val client: AperoClient) : EntryReposi
 
         val future = client.getEntries()
         future.whenComplete { value, exception ->
-            exception ?: return@whenComplete
+            if (exception != null) {
+                Log.e(TAG, "unable to get entries", exception)
+                return@whenComplete
+            }
             data.postValue(value)
         }
 
