@@ -1,6 +1,7 @@
 package fr.rischmann.apero
 
 import android.util.Log
+import fr.rischmann.apero.Logging.TAG
 import org.bouncycastle.math.ec.rfc8032.Ed25519
 
 object Crypto {
@@ -21,7 +22,7 @@ object Crypto {
 
     fun openSecretBox(box: SecretBox, data: ByteArray): ByteArray? {
         if (data.size <= SecretBox.NONCE_SIZE) {
-            Log.e(Logging.TAG, "invalid secret box size")
+            Log.e(TAG, "invalid secret box size")
             return null
         }
 

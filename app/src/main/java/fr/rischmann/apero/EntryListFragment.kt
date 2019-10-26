@@ -2,9 +2,11 @@ package fr.rischmann.apero
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +29,13 @@ class EntryListFragment : Fragment() {
         } ?: throw Exception("invalid activity")
 
         _vm.entries.observeForever {
-            _adapter.setData(it)
+            when (it.status) {
+                is AperoStatus.OK -> _adapter.setData(it.item)
+                is AperoStatus.Error -> {
+                    Toast.makeText(context, "Unable to get entries from the server", Toast.LENGTH_LONG).show()
+                    Log.e(Logging.TAG, it.status.msg, it.status.throwable)
+                }
+            }
         }
     }
 

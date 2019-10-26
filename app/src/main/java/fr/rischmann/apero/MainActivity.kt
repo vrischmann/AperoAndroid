@@ -85,9 +85,20 @@ class MainActivity : AppCompatActivity(),
         Log.i(TAG, "move item $item")
 
         _vm.moveEntry(item)?.let {
-            Log.d(TAG, "moved item ${item.id}")
-
-            copyItemToClipboard(item.id, it)
+            when (it.status) {
+                is AperoStatus.OK -> {
+                    Log.d(TAG, "moved item ${item.id}")
+                    copyItemToClipboard(item.id, it.item)
+                }
+                is AperoStatus.NotFound -> {
+                    Log.d(TAG, "item ${item.id} doesn't exist")
+                    Toast.makeText(applicationContext, getString(R.string.client_item_does_not_exist), Toast.LENGTH_LONG).show()
+                }
+                is AperoStatus.Error -> {
+                    Log.e(TAG, it.status.msg, it.status.throwable)
+                    Toast.makeText(applicationContext, getString(R.string.client_unable_move_item), Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -104,9 +115,20 @@ class MainActivity : AppCompatActivity(),
         Log.i(TAG, "paste item $item")
 
         _vm.pasteEntry(item)?.let {
-            Log.d(TAG, "pasted item ${item.id}")
-
-            copyItemToClipboard(item.id, it)
+            when (it.status) {
+                is AperoStatus.OK -> {
+                    Log.d(TAG, "pasted item ${item.id}")
+                    copyItemToClipboard(item.id, it.item)
+                }
+                is AperoStatus.NotFound -> {
+                    Log.d(TAG, "item ${item.id} doesn't exist")
+                    Toast.makeText(applicationContext, getString(R.string.client_item_does_not_exist), Toast.LENGTH_LONG).show()
+                }
+                is AperoStatus.Error -> {
+                    Log.e(TAG, it.status.msg, it.status.throwable)
+                    Toast.makeText(applicationContext, getString(R.string.client_unable_paste_item), Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -131,7 +153,11 @@ class MainActivity : AppCompatActivity(),
         // The data in each entry is itself encrypted with our E2E key
         val box = SecretBox(_encryptKey)
 
-        val plaintext = Crypto.openSecretBox(box, data) ?: return
+        val plaintext = Crypto.openSecretBox(box, data)
+        if (plaintext == null) {
+            Log.w(TAG, "unable to open E2E secret box")
+            return
+        }
         val s = String(plaintext, Charset.defaultCharset())
 
         Log.d(TAG, s)
@@ -160,6 +186,8 @@ class MainActivity : AppCompatActivity(),
         Log.i(TAG, "creating client to $endpoint")
 
         val credentials = if (BuildConfig.DEBUG) {
+            Log.d(TAG, "loading from debug configuration")
+
             val psKey = BuildConfig.PS_KEY.let(::fromB64) ?: byteArrayOf()
             val encryptKey = BuildConfig.ENCRYPT_KEY.let(::fromB64) ?: byteArrayOf()
             val signPublicKey = BuildConfig.SIGN_PUBLIC_KEY.let(::fromB64) ?: byteArrayOf()
@@ -169,6 +197,8 @@ class MainActivity : AppCompatActivity(),
 
             Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         } else {
+            Log.d(TAG, "loading from preferences")
+
             fun g(key: String): String? {
                 return p.getString(key, "")
             }
@@ -188,6 +218,7 @@ class MainActivity : AppCompatActivity(),
             return
         }
 
+        _encryptKey = credentials.encryptKey
         _client = AperoClient.real(endpoint, credentials)
     }
 

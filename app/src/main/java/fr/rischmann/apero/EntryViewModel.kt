@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import fr.rischmann.apero.Logging.TAG
 import java.util.concurrent.CancellationException
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
@@ -18,22 +17,22 @@ class EntryViewModelFactory(private val client: EntryRepository) : ViewModelProv
 class EntryViewModel(private val repository: EntryRepository) : ViewModel() {
     private val reload = MutableLiveData<Boolean>()
 
-    val entries: LiveData<Entries> = Transformations.switchMap(reload) {
+    val entries: LiveData<AperoResponse<Entries>> = Transformations.switchMap(reload) {
         repository.getEntries()
     }
 
 
-    fun moveEntry(entry: Entry): ByteArray? {
+    fun moveEntry(entry: Entry): AperoResponse<ByteArray>? {
         val ld = repository.moveEntry(entry)
         return resultFromFuture(entry, ld)
     }
 
-    fun pasteEntry(entry: Entry): ByteArray? {
+    fun pasteEntry(entry: Entry): AperoResponse<ByteArray>? {
         val ld = repository.pasteEntry(entry)
         return resultFromFuture(entry, ld)
     }
 
-    private fun resultFromFuture(entry: Entry, future: CompletableFuture<ByteArray>): ByteArray? {
+    private fun resultFromFuture(entry: Entry, future: AperoCompletableFuture<ByteArray>): AperoResponse<ByteArray>? {
         return try {
             future.get(4, TimeUnit.SECONDS)?.also {
                 // If we did paste the item trigger a reload of the list
@@ -44,6 +43,9 @@ class EntryViewModel(private val repository: EntryRepository) : ViewModel() {
             null
         } catch (e: CancellationException) {
             Log.e(TAG, "unable to move entry $entry", e)
+            null
+        } catch (e: IllegalStateException) {
+            Log.w(TAG, "unable to execute future", e)
             null
         }
     }

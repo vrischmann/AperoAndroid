@@ -6,10 +6,22 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
+sealed class AperoStatus {
+    object OK : AperoStatus()
+    object NotFound : AperoStatus()
+    data class Error(val msg: String, val throwable: Throwable?) : AperoStatus() {
+        constructor(msg: String) : this(msg, null)
+    }
+}
+
+data class AperoResponse<T>(val item: T, val status: AperoStatus)
+
+typealias AperoCompletableFuture<T> = CompletableFuture<AperoResponse<T>>
+
 interface AperoClient {
-    fun getEntries(): CompletableFuture<Entries>
-    fun moveEntry(entry: Entry): CompletableFuture<ByteArray>
-    fun pasteEntry(entry: Entry): CompletableFuture<ByteArray>
+    fun getEntries(): AperoCompletableFuture<Entries>
+    fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray>
+    fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray>
 
     companion object {
         fun real(endpoint: String, credentials: Credentials): AperoClient {
@@ -22,24 +34,39 @@ interface AperoClient {
     }
 }
 
-private class DummyClient() : AperoClient {
-    override fun getEntries(): CompletableFuture<Entries> {
-        return CompletableFuture.completedFuture(emptyList())
+private class DummyClient : AperoClient {
+    override fun getEntries(): AperoCompletableFuture<Entries> {
+        return CompletableFuture.completedFuture(
+            AperoResponse(
+                item = emptyList(),
+                status = AperoStatus.OK
+            )
+        )
     }
 
-    override fun moveEntry(entry: Entry): CompletableFuture<ByteArray> {
-        return CompletableFuture.completedFuture(byteArrayOf())
+    override fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+        return CompletableFuture.completedFuture(
+            AperoResponse(
+                item = byteArrayOf(),
+                status = AperoStatus.OK
+            )
+        )
     }
 
-    override fun pasteEntry(entry: Entry): CompletableFuture<ByteArray> {
-        return CompletableFuture.completedFuture(byteArrayOf())
+    override fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+        return CompletableFuture.completedFuture(
+            AperoResponse(
+                item = byteArrayOf(),
+                status = AperoStatus.OK
+            )
+        )
     }
 }
 
 private class RealAperoClient(private val endpoint: String, private val credentials: Credentials) : AperoClient {
     private val httpClient: OkHttpClient = OkHttpClient()
 
-    override fun getEntries(): CompletableFuture<Entries> {
+    override fun getEntries(): AperoCompletableFuture<Entries> {
         Log.d(Logging.TAG, "loading entries from $endpoint")
 
         // Prepare a secret box
@@ -60,32 +87,32 @@ private class RealAperoClient(private val endpoint: String, private val credenti
             .post(ciphertext.toRequestBody())
             .build()
 
-        val data = CompletableFuture<Entries>()
+        val data = AperoCompletableFuture<Entries>()
 
         httpClient.newCall(req).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                // TODO(vincent): error handling
-
                 if (response.code != 200) {
-                    Log.e(Logging.TAG, "invalid response code ${response.code}")
+                    data.complete(AperoResponse(emptyList(), AperoStatus.Error("invalid response code ${response.code}")))
                     return
                 }
 
                 if (response.body == null) {
-                    Log.e(Logging.TAG, "no response body in list request")
+                    data.complete(AperoResponse(emptyList(), AperoStatus.Error("no body in list response")))
                     return
                 }
+
                 val respData = response.body!!.bytes()
 
                 val plaintext = Crypto.openSecretBox(secretBox, respData)
                 if (plaintext == null) {
-                    Log.e(Logging.TAG, "unable to open box")
+                    data.complete(AperoResponse(emptyList(), AperoStatus.Error("unable to open PSKey secret box")))
                     return
                 }
 
                 val resp = JSONHelpers.objectMapper.readValue(plaintext, APITypes.ListResponse::class.java)
+                val entries = resp.entries.map(::Entry)
 
-                data.complete(resp.entries.map(::Entry))
+                data.complete(AperoResponse(entries, AperoStatus.OK))
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -96,12 +123,12 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         return data
     }
 
-    override fun moveEntry(entry: Entry): CompletableFuture<ByteArray> {
+    override fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
         Log.d(Logging.TAG, "move entry ${entry.id}")
         return moveOrPasteEntry(entry, Operation.MOVE)
     }
 
-    override fun pasteEntry(entry: Entry): CompletableFuture<ByteArray> {
+    override fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
         Log.d(Logging.TAG, "paste entry ${entry.id}")
         return moveOrPasteEntry(entry, Operation.PASTE)
     }
@@ -110,7 +137,7 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         MOVE, PASTE
     }
 
-    private fun moveOrPasteEntry(entry: Entry, operation: Operation): CompletableFuture<ByteArray> {
+    private fun moveOrPasteEntry(entry: Entry, operation: Operation): AperoCompletableFuture<ByteArray> {
         // Prepare a secret box
         val secretBox = SecretBox(credentials.psKey)
 
@@ -140,35 +167,40 @@ private class RealAperoClient(private val endpoint: String, private val credenti
 
         val req = builder.build()
 
-        val future = CompletableFuture<ByteArray>()
+        val future = AperoCompletableFuture<ByteArray>()
 
         httpClient.newCall(req).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                // TODO(vincent): error handling
+                // Handle errors
 
+                if (response.code == 404) {
+                    future.complete(AperoResponse(byteArrayOf(), AperoStatus.NotFound))
+                    return
+                }
                 if (response.code != 200) {
-                    future.completeExceptionally(IllegalStateException("invalid response code ${response.code}"))
+                    future.complete(AperoResponse(byteArrayOf(), AperoStatus.Error("invalid response code ${response.code}")))
+                    return
+                }
+                if (response.body == null) {
+                    future.complete(AperoResponse(byteArrayOf(), AperoStatus.Error("no body in move response")))
                     return
                 }
 
-                if (response.body == null) {
-                    future.completeExceptionally(IllegalStateException("no response body in move request"))
-                    return
-                }
+                // Handle normal case
+
                 val respData = response.body!!.bytes()
 
                 val plaintext = Crypto.openSecretBox(secretBox, respData)
                 if (plaintext == null) {
-                    future.completeExceptionally(IllegalStateException("unable to open secret box"))
+                    future.complete(AperoResponse(byteArrayOf(), AperoStatus.Error("unable to open PSKey secret box")))
                     return
                 }
 
-                future.complete(plaintext)
+                future.complete(AperoResponse(plaintext, AperoStatus.OK))
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(Logging.TAG, "call to move entry failed", e)
-                future.completeExceptionally(e)
+                future.complete(AperoResponse(byteArrayOf(), AperoStatus.Error("call to move entry failed", e)))
             }
         })
 
