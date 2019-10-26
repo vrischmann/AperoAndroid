@@ -172,6 +172,8 @@ class MainActivity : AppCompatActivity(),
                     _client = AperoClient.dummy()
                     return
                 }
+
+                _client = AperoClient.real(endpoint, _credentials)
             }
         }
     }
