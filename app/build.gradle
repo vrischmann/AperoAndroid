@@ -44,10 +44,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     // my stuff
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.62'
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.7'
 
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.1'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
     implementation group: 'com.github.vrischmann', name: 'ulid-java', version: '6bf27f9e8f7418ec8a381c524d5a4c884131271a'
 
