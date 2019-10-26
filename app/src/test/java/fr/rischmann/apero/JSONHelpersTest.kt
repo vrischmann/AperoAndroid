@@ -1,5 +1,6 @@
 package fr.rischmann.apero
 
+import fr.rischmann.ulid.ULID
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
