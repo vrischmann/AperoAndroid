@@ -148,34 +148,36 @@ class MainActivity : AppCompatActivity(),
 
         Log.i(TAG, "creating client to $endpoint")
 
-        when (BuildConfig.DEBUG) {
-            true -> {
+        val credentials = if (BuildConfig.DEBUG) {
+            val psKey = BuildConfig.PS_KEY.let(::fromB64) ?: byteArrayOf()
+            val encryptKey = BuildConfig.ENCRYPT_KEY.let(::fromB64) ?: byteArrayOf()
+            val signPublicKey = BuildConfig.SIGN_PUBLIC_KEY.let(::fromB64) ?: byteArrayOf()
+            // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
+            // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
+            val signPrivateKey = BuildConfig.SIGN_PRIVATE_KEY.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
 
-                _client = AperoClient.dummy()
-
+            Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
+        } else {
+            fun g(key: String): String? {
+                return p.getString(key, "")
             }
 
-            false -> {
-                fun g(key: String): String? {
-                    return p.getString(key, "")
-                }
+            val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
+            val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
+            val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
+            // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
+            // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
+            val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
 
-                val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
-                val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
-                val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
-                // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
-                // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-                val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
-
-                _credentials = Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
-                if (!_credentials.isValid()) {
-                    _client = AperoClient.dummy()
-                    return
-                }
-
-                _client = AperoClient.real(endpoint, _credentials)
-            }
+            Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         }
+
+        if (!credentials.isValid()) {
+            _client = AperoClient.dummy()
+            return
+        }
+
+        _client = AperoClient.real(endpoint, credentials)
     }
 
     private fun createRepository() {
