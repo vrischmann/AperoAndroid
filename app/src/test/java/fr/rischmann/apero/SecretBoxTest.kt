@@ -9,10 +9,8 @@ import org.junit.Test
 class SecretBoxTest {
     @Test
     fun sealOpenGoGenerated() {
-        val key = Hex.decode("e39616fa92ab3779f1503a31ed71a9990eb3524be51257b7d645ec588dc0b7e1")
-
-        val input =
-            Hex.decode("43ef80e62ee631cf73cf526ccff1dc92c4cbdc1c4b14c19a46cc2b612ed698e8fbc9f34caa3fecb50673200ede82")
+        val key = Hex.decode("61caae80b04a17c12a824c6e65ff7e65da611b23e2aa0a4432995e8be79dc2f2")
+        val input = Hex.decode("1de6a57f064df85a81620a925eb85adb04fce5ad12aed3e590fb0d7d856a5bcec6590c128468ceff8c35")
 
         val nonce = input.sliceArray(0 until SecretBox.NONCE_SIZE)
         val ciphertext = input.sliceArray(SecretBox.NONCE_SIZE until input.size)
