@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(),
 
     private lateinit var _vm: EntryViewModel
 
-    private lateinit var _credentials: Credentials
+    private var _encryptKey = byteArrayOf()
 
     private var _client = AperoClient.dummy()
     private var _repository = EntryRepository.real(_client)
@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListItemMove(item: Entry?) {
-        if (item == null) {
+        if (item == null || _encryptKey.isEmpty()) {
             return
         }
 
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListItemPaste(item: Entry?) {
-        if (item == null) {
+        if (item == null || _encryptKey.isEmpty()) {
             return
         }
 
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun copyItemToClipboard(id: ULID, data: ByteArray) {
         // The data in each entry is itself encrypted with our E2E key
-        val box = SecretBox(_credentials.encryptKey)
+        val box = SecretBox(_encryptKey)
 
         val plaintext = Crypto.openSecretBox(box, data) ?: return
         val s = String(plaintext, Charset.defaultCharset())
