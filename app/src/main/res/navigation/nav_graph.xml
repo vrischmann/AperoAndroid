@@ -25,5 +25,11 @@
         android:id="@+id/miCopyFragment"
         android:name="fr.rischmann.apero.CopyFragment"
         android:label="Copy"
-        tools:layout="@layout/fragment_copy" />
+        tools:layout="@layout/fragment_copy">
+
+        <argument
+            android:name="content"
+            app:argType="string" />
+
+    </fragment>
 </navigation>

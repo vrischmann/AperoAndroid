@@ -1,9 +1,6 @@
 package fr.rischmann.apero
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -11,7 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -56,6 +53,13 @@ class MainActivity : AppCompatActivity(),
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.setupWithNavController(navController, appBarConfiguration)
+
+        if (intent?.action == Intent.ACTION_SEND) {
+            intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                val bundle = bundleOf(Pair("content", it))
+                navController.navigate(R.id.action_miListFragment_to_copyFragment, bundle)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -145,15 +149,10 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun createViewModel() {
-        Log.d(TAG, "recreating view model")
-
         viewModelStore.clear()
 
         val vmFactory = EntryViewModelFactory(_repository)
         _vm = ViewModelProviders.of(this, vmFactory)[EntryViewModel::class.java]
-        _vm.entries.observe(this, Observer {
-            Log.d(TAG, "loaded entries: $it")
-        })
     }
 
     private fun copyItemToClipboard(id: ULID, data: ByteArray) {

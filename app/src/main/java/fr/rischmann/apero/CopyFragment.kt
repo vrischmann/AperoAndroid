@@ -21,11 +21,22 @@ class CopyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val editText = view.findViewById<EditText>(R.id.copyEditText)
-        savedInstanceState?.let {
-            val s = it.getString("content")
-            Log.d(TAG, "saved content: $s")
+        val content = when {
+            arguments?.getString("content") != null -> {
+                val s = arguments?.getString("content")
+                Log.d(TAG, "received content from intent: $s")
+                s
+            }
+            savedInstanceState != null -> {
+                val s = savedInstanceState.getString("content")
+                Log.d(TAG, "saved content: $s")
+                s
+            }
+            else -> ""
         }
+
+        val editText = view.findViewById<EditText>(R.id.copyEditText)
+        editText.text.insert(0, content)
 
         val copyButton = view.findViewById<Button>(R.id.copyButton)
         copyButton.setOnClickListener {
