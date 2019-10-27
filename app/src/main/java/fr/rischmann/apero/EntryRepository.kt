@@ -21,9 +21,9 @@ class Credentials(
 }
 
 interface EntryRepository {
-    fun getEntries(): LiveData<AperoResponse<Entries>>
-    fun moveEntry(entry: Entry): CompletableFuture<AperoResponse<ByteArray>>
-    fun pasteEntry(entry: Entry): CompletableFuture<AperoResponse<ByteArray>>
+    fun list(): LiveData<AperoResponse<Entries>>
+    fun move(entry: Entry): CompletableFuture<AperoResponse<ByteArray>>
+    fun paste(entry: Entry): CompletableFuture<AperoResponse<ByteArray>>
 
     companion object {
         fun real(client: AperoClient): EntryRepository {
@@ -33,10 +33,10 @@ interface EntryRepository {
 }
 
 private class RealEntryRepository(private val client: AperoClient) : EntryRepository {
-    override fun getEntries(): LiveData<AperoResponse<Entries>> {
+    override fun list(): LiveData<AperoResponse<Entries>> {
         val data = MutableLiveData<AperoResponse<Entries>>()
 
-        val future = client.getEntries()
+        val future = client.list()
         future.whenComplete { value, exception ->
             if (exception != null) {
                 Log.e(TAG, "unable to get entries", exception)
@@ -48,7 +48,7 @@ private class RealEntryRepository(private val client: AperoClient) : EntryReposi
         return data
     }
 
-    override fun moveEntry(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> = client.moveEntry(entry)
+    override fun move(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> = client.move(entry)
 
-    override fun pasteEntry(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> = client.pasteEntry(entry)
+    override fun paste(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> = client.paste(entry)
 }

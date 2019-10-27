@@ -22,10 +22,10 @@ data class AperoResponse<T>(val item: T, val status: AperoStatus)
 typealias AperoCompletableFuture<T> = CompletableFuture<AperoResponse<T>>
 
 interface AperoClient {
-    fun getEntries(): AperoCompletableFuture<Entries>
-    fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray>
-    fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray>
-    fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID>
+    fun list(): AperoCompletableFuture<Entries>
+    fun move(entry: Entry): AperoCompletableFuture<ByteArray>
+    fun paste(entry: Entry): AperoCompletableFuture<ByteArray>
+    fun copy(content: ByteArray): AperoCompletableFuture<ULID>
 
     companion object {
         fun real(endpoint: String, credentials: Credentials): AperoClient {
@@ -39,7 +39,7 @@ interface AperoClient {
 }
 
 private class DummyClient : AperoClient {
-    override fun getEntries(): AperoCompletableFuture<Entries> {
+    override fun list(): AperoCompletableFuture<Entries> {
         return CompletableFuture.completedFuture(
             AperoResponse(
                 item = emptyList(),
@@ -48,7 +48,7 @@ private class DummyClient : AperoClient {
         )
     }
 
-    override fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+    override fun move(entry: Entry): AperoCompletableFuture<ByteArray> {
         return CompletableFuture.completedFuture(
             AperoResponse(
                 item = byteArrayOf(),
@@ -57,7 +57,7 @@ private class DummyClient : AperoClient {
         )
     }
 
-    override fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+    override fun paste(entry: Entry): AperoCompletableFuture<ByteArray> {
         return CompletableFuture.completedFuture(
             AperoResponse(
                 item = byteArrayOf(),
@@ -66,7 +66,7 @@ private class DummyClient : AperoClient {
         )
     }
 
-    override fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID> {
+    override fun copy(content: ByteArray): AperoCompletableFuture<ULID> {
         val ts = Instant.now().toEpochMilli()
         return CompletableFuture.completedFuture(
             AperoResponse(
@@ -80,7 +80,7 @@ private class DummyClient : AperoClient {
 private class RealAperoClient(private val endpoint: String, private val credentials: Credentials) : AperoClient {
     private val httpClient: OkHttpClient = OkHttpClient()
 
-    override fun getEntries(): AperoCompletableFuture<Entries> {
+    override fun list(): AperoCompletableFuture<Entries> {
         Log.d(Logging.TAG, "loading entries from $endpoint")
 
         // Prepare a secret box
@@ -137,7 +137,7 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         return data
     }
 
-    override fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID> {
+    override fun copy(content: ByteArray): AperoCompletableFuture<ULID> {
         // Prepare a secret box
         val secretBox = SecretBox(credentials.psKey)
 
@@ -202,12 +202,12 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         return future
     }
 
-    override fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+    override fun move(entry: Entry): AperoCompletableFuture<ByteArray> {
         Log.d(Logging.TAG, "move entry ${entry.id}")
         return moveOrPasteEntry(entry, Operation.MOVE)
     }
 
-    override fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
+    override fun paste(entry: Entry): AperoCompletableFuture<ByteArray> {
         Log.d(Logging.TAG, "paste entry ${entry.id}")
         return moveOrPasteEntry(entry, Operation.PASTE)
     }

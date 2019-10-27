@@ -18,17 +18,17 @@ class EntryViewModel(private val repository: EntryRepository) : ViewModel() {
     private val reload = MutableLiveData<Boolean>()
 
     val entries: LiveData<AperoResponse<Entries>> = Transformations.switchMap(reload) {
-        repository.getEntries()
+        repository.list()
     }
 
 
     fun moveEntry(entry: Entry): AperoResponse<ByteArray>? {
-        val ld = repository.moveEntry(entry)
+        val ld = repository.move(entry)
         return resultFromFuture(entry, ld)
     }
 
     fun pasteEntry(entry: Entry): AperoResponse<ByteArray>? {
-        val ld = repository.pasteEntry(entry)
+        val ld = repository.paste(entry)
         return resultFromFuture(entry, ld)
     }
 
