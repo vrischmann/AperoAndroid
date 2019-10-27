@@ -150,10 +150,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun copyItemToClipboard(id: ULID, data: ByteArray) {
-        // The data in each entry is itself encrypted with our E2E key
-        val box = SecretBox(_encryptKey)
-
-        val plaintext = Crypto.openSecretBox(box, data)
+        val plaintext = Crypto.openSecretBox(SecretBox(_encryptKey), data)
         if (plaintext == null) {
             Log.w(TAG, "unable to open E2E secret box")
             return
@@ -218,7 +215,7 @@ class MainActivity : AppCompatActivity(),
             return
         }
 
-        _encryptKey = credentials.encryptKey
+        _encryptKey = credentials.encryptKey.copyOf()
         _client = AperoClient.real(endpoint, credentials)
     }
 

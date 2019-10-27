@@ -2,11 +2,24 @@ package fr.rischmann.apero
 
 import fr.rischmann.apero.TestHelpers.b64
 import org.bouncycastle.math.ec.rfc8032.Ed25519
+import org.bouncycastle.util.encoders.Hex
 import org.junit.Assert.*
 import org.junit.Test
 import java.security.SecureRandom
 
 class CryptoTest {
+    @Test
+    fun open() {
+        val key = Hex.decode("61caae80b04a17c12a824c6e65ff7e65da611b23e2aa0a4432995e8be79dc2f2")
+        val input = Hex.decode("63b7379c350cd231ba74aaa13c0ceb3626240f30254a5fb0c4bba811ae8314f1864f484516054d89ada72e335ff6e2")
+
+        val box = SecretBox(key)
+
+        val plaintext = Crypto.openSecretBox(box, input)
+        val message = plaintext?.toString(Charsets.UTF_8)
+        assertEquals("yellow\n", message)
+    }
+
     @Test
     fun signAndVerify() {
         val privateKey = ByteArray(Ed25519.SECRET_KEY_SIZE)

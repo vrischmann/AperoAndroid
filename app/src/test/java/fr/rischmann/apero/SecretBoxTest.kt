@@ -10,7 +10,7 @@ class SecretBoxTest {
     @Test
     fun sealOpenGoGenerated() {
         val key = Hex.decode("61caae80b04a17c12a824c6e65ff7e65da611b23e2aa0a4432995e8be79dc2f2")
-        val input = Hex.decode("07540d0ad584eb29b01b8dad06309ea4604dc19b4d3bb02017d3967476922433c0bdb5b3c549cac1d57015770cf6a6")
+        val input = Hex.decode("b829ada6d2669feb76bd4113b3f84a45f29c171e458b71599a78342d7699d5a7997782baa6cfb8d3527d82018e9f68")
 
         val nonce = input.sliceArray(0 until SecretBox.NONCE_SIZE)
         assertTrue(nonce.size == SecretBox.NONCE_SIZE)
