@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import fr.rischmann.apero.Logging.TAG
 
 class EntryListFragment : Fragment() {
     private var moveListener: OnListItemMove? = null
@@ -33,7 +34,7 @@ class EntryListFragment : Fragment() {
                 is AperoStatus.OK -> _adapter.setData(it.item)
                 is AperoStatus.Error -> {
                     Toast.makeText(context, "Unable to get entries from the server", Toast.LENGTH_LONG).show()
-                    Log.e(Logging.TAG, it.status.msg, it.status.throwable)
+                    Log.e(TAG, it.status.msg, it.status.throwable)
                 }
             }
         }

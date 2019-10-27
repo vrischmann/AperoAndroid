@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity(),
 
         //
 
-        recreateClient()
-        recreateVM()
+        createRepositoryFromPrefs()
+        createViewModel()
 
         //
 
@@ -64,7 +64,8 @@ class MainActivity : AppCompatActivity(),
     override fun onResume() {
         super.onResume()
 
-        recreateClient()
+        createRepositoryFromPrefs()
+        createViewModel()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun recreateClient() {
+    private fun createRepositoryFromPrefs() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
 
@@ -141,7 +142,11 @@ class MainActivity : AppCompatActivity(),
         createRepository()
     }
 
-    private fun recreateVM() {
+    private fun createViewModel() {
+        Log.d(TAG, "recreating view model")
+
+        viewModelStore.clear()
+
         val vmFactory = EntryViewModelFactory(_repository)
         _vm = ViewModelProviders.of(this, vmFactory)[EntryViewModel::class.java]
         _vm.entries.observe(this, Observer {
@@ -170,6 +175,7 @@ class MainActivity : AppCompatActivity(),
             Log.d(TAG, "preferences changed")
             createClientFromPrefs(it)
             createRepository()
+            createViewModel()
         }
     }
 
