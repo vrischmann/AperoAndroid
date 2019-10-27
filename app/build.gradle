@@ -16,6 +16,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "PS_KEY", "\"\""
+            buildConfigField "String", "ENCRYPT_KEY", "\"\""
+            buildConfigField "String", "SIGN_PUBLIC_KEY", "\"\""
+            buildConfigField "String", "SIGN_PRIVATE_KEY", "\"\""
         }
 
         debug {
