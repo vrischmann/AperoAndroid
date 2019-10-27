@@ -22,11 +22,13 @@ import androidx.preference.PreferenceManager
 import fr.rischmann.apero.Logging.TAG
 import fr.rischmann.ulid.ULID
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 class MainActivity : AppCompatActivity(),
     EntryListFragment.OnListItemMove,
     EntryListFragment.OnListItemPaste,
+    CopyFragment.OnCopyListener,
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var _vm: EntryViewModel
@@ -168,6 +170,32 @@ class MainActivity : AppCompatActivity(),
 
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(clipData)
+    }
+
+    override fun onCopy(text: String) {
+        val content = text.toByteArray(StandardCharsets.UTF_8)
+
+        // Encrypt with the e2e encryption key
+        val ciphertext = SecretBox(_encryptKey).seal(content, SecretBox.newNonce())
+
+        _client.copy(ciphertext).handle { response, exception ->
+            if (exception != null) {
+                Log.e(TAG, "unable to copy content", exception)
+                Toast.makeText(applicationContext, getString(R.string.unable_copy_to_server), Toast.LENGTH_LONG).show()
+                return@handle
+            }
+
+            when (response.status) {
+                is AperoStatus.OK -> {
+                    Log.d(TAG, "copied content, id is $response")
+                    Toast.makeText(applicationContext, "Copy successful", Toast.LENGTH_LONG).show()
+                }
+                is AperoStatus.Error -> {
+                    Log.e(TAG, response.status.msg, response.status.throwable)
+                    Toast.makeText(applicationContext, getString(R.string.unable_copy_to_server), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

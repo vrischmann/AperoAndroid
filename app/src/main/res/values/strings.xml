@@ -8,4 +8,5 @@
     <string name="client_item_does_not_exist">Item doesn\'t exist on the server</string>
     <string name="client_unable_move_item">Unable to move item from the server</string>
     <string name="client_unable_paste_item">Unable to paste item from the server</string>
+    <string name="unable_copy_to_server">Unable to copy content to server</string>
 </resources>
