@@ -1,9 +1,12 @@
 package fr.rischmann.apero
 
 import android.util.Log
+import fr.rischmann.ulid.ULID
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.security.SecureRandom
+import java.time.Instant
 import java.util.concurrent.CompletableFuture
 
 sealed class AperoStatus {
@@ -22,6 +25,7 @@ interface AperoClient {
     fun getEntries(): AperoCompletableFuture<Entries>
     fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray>
     fun pasteEntry(entry: Entry): AperoCompletableFuture<ByteArray>
+    fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID>
 
     companion object {
         fun real(endpoint: String, credentials: Credentials): AperoClient {
@@ -57,6 +61,16 @@ private class DummyClient : AperoClient {
         return CompletableFuture.completedFuture(
             AperoResponse(
                 item = byteArrayOf(),
+                status = AperoStatus.OK
+            )
+        )
+    }
+
+    override fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID> {
+        val ts = Instant.now().toEpochMilli()
+        return CompletableFuture.completedFuture(
+            AperoResponse(
+                item = ULID.random(ts, SecureRandom()),
                 status = AperoStatus.OK
             )
         )
@@ -121,6 +135,71 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         })
 
         return data
+    }
+
+    override fun copyEntry(content: ByteArray): AperoCompletableFuture<ULID> {
+        // Prepare a secret box
+        val secretBox = SecretBox(credentials.psKey)
+
+        // Sign the id
+        val signature = Crypto.sign(credentials.signPrivateKey, content)
+
+        val copyRequest = APITypes.CopyRequest(
+            signature = signature,
+            content = content
+        )
+
+        // Encode the list request
+        val payload = JSONHelpers.objectMapper.writeValueAsBytes(copyRequest)
+
+        // Encrypt the payload with the pre-shared key
+        val ciphertext = secretBox.seal(payload, SecretBox.newNonce())
+
+        val req = Request.Builder()
+            .url("$endpoint/api/v1/copy")
+            .post(ciphertext.toRequestBody())
+            .build()
+
+        val future = AperoCompletableFuture<ULID>()
+
+        httpClient.newCall(req).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                // Handle errors
+
+                if (response.code != 202) {
+                    future.complete(AperoResponse(emptyULID(), AperoStatus.Error("invalid response code ${response.code}")))
+                    return
+                }
+                if (response.body == null) {
+                    future.complete(AperoResponse(emptyULID(), AperoStatus.Error("no body in move response")))
+                    return
+                }
+
+                // Handle normal case
+
+                val respData = response.body!!.bytes()
+
+                val plaintext = Crypto.openSecretBox(secretBox, respData)
+                if (plaintext == null) {
+                    future.complete(AperoResponse(emptyULID(), AperoStatus.Error("unable to open PSKey secret box")))
+                    return
+                }
+
+                if (plaintext.size != 16) {
+                    future.complete(AperoResponse(emptyULID(), AperoStatus.Error("invalid ULID size ${plaintext.size}")))
+                    return
+                }
+
+
+                future.complete(AperoResponse(ULID(plaintext), AperoStatus.OK))
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                future.complete(AperoResponse(emptyULID(), AperoStatus.Error("call to move entry failed", e)))
+            }
+        })
+
+        return future
     }
 
     override fun moveEntry(entry: Entry): AperoCompletableFuture<ByteArray> {
@@ -209,5 +288,9 @@ private class RealAperoClient(private val endpoint: String, private val credenti
 
     companion object {
         private val listPayload = byteArrayOf('L'.toByte())
+
+        private fun emptyULID(): ULID {
+            return ULID(byteArrayOf())
+        }
     }
 }
