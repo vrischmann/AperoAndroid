@@ -230,16 +230,12 @@ class MainActivity : AppCompatActivity(),
         } else {
             Log.d(TAG, "loading from preferences")
 
-            fun g(key: String): String? {
-                return p.getString(key, "")
-            }
-
-            val psKey = g("psKey")?.let(::fromB64) ?: byteArrayOf()
-            val encryptKey = g("encryptKey")?.let(::fromB64) ?: byteArrayOf()
-            val signPublicKey = g("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
+            val psKey = p.string("psKey")?.let(::fromB64) ?: byteArrayOf()
+            val encryptKey = p.string("encryptKey")?.let(::fromB64) ?: byteArrayOf()
+            val signPublicKey = p.string("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
             // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
             // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-            val signPrivateKey = g("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
+            val signPrivateKey = p.string("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
 
             Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         }
@@ -256,6 +252,10 @@ class MainActivity : AppCompatActivity(),
     private fun createRepository() {
         _repository = EntryRepository.real(_client)
     }
+}
+
+private fun SharedPreferences.string(key: String): String? {
+    return this.getString(key, "")
 }
 
 private fun fromB64(s: String): ByteArray? {
