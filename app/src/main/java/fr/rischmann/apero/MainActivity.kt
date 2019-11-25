@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(),
             Log.w(TAG, "unable to open E2E secret box")
             return
         }
-        val s = String(plaintext, Charset.defaultCharset())
+        val s = String(plaintext, Charset.defaultCharset()).trim()
 
         Log.d(TAG, s)
 
