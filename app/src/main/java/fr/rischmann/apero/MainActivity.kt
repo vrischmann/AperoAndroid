@@ -17,6 +17,8 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.rischmann.apero.Logging.TAG
+import fr.rischmann.bip39.BIP39
+import fr.rischmann.bip39.WordList
 import fr.rischmann.ulid.ULID
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -218,23 +220,19 @@ class MainActivity : AppCompatActivity(),
         val credentials = if (BuildConfig.DEBUG) {
             Log.d(TAG, "loading from debug configuration")
 
-            val psKey = BuildConfig.PS_KEY.let(::fromB64) ?: byteArrayOf()
-            val encryptKey = BuildConfig.ENCRYPT_KEY.let(::fromB64) ?: byteArrayOf()
-            val signPublicKey = BuildConfig.SIGN_PUBLIC_KEY.let(::fromB64) ?: byteArrayOf()
-            // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
-            // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-            val signPrivateKey = BuildConfig.SIGN_PRIVATE_KEY.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
+            val psKey = BuildConfig.PS_KEY.let(::parsePreference) ?: byteArrayOf()
+            val encryptKey = BuildConfig.ENCRYPT_KEY.let(::parsePreference) ?: byteArrayOf()
+            val signPublicKey = BuildConfig.SIGN_PUBLIC_KEY.let(::parsePreference) ?: byteArrayOf()
+            val signPrivateKey = BuildConfig.SIGN_PRIVATE_KEY.let(::parsePreference) ?: byteArrayOf()
 
             Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         } else {
             Log.d(TAG, "loading from preferences")
 
-            val psKey = p.string("psKey")?.let(::fromB64) ?: byteArrayOf()
-            val encryptKey = p.string("encryptKey")?.let(::fromB64) ?: byteArrayOf()
-            val signPublicKey = p.string("signPublicKey")?.let(::fromB64) ?: byteArrayOf()
-            // only use the first 32 bytes because Bouncycastle's and Go's implementation of ed25519 are not strictly compatible.
-            // Bouncycastle's private keys are what the Go package calls seeds: https://godoc.org/golang.org/x/crypto/ed25519
-            val signPrivateKey = p.string("signPrivateKey")?.let(::fromB64)?.sliceArray(0..31) ?: byteArrayOf()
+            val psKey = p.string("psKey")?.let(::parsePreference) ?: byteArrayOf()
+            val encryptKey = p.string("encryptKey")?.let(::parsePreference) ?: byteArrayOf()
+            val signPublicKey = p.string("signPublicKey")?.let(::parsePreference) ?: byteArrayOf()
+            val signPrivateKey = p.string("signPrivateKey")?.let(::parsePreference) ?: byteArrayOf()
 
             Credentials(psKey, encryptKey, signPublicKey, signPrivateKey)
         }
@@ -257,11 +255,26 @@ private fun SharedPreferences.string(key: String): String? {
     return this.getString(key, "")
 }
 
-private fun fromB64(s: String): ByteArray? {
+private fun parsePreference(pref: String): ByteArray? {
+    val s = pref.trim()
+
     if (s.isEmpty()) {
         return null
     }
-    return Base64.getDecoder().decode(s)
+
+    try {
+        return Base64.getDecoder().decode(s)
+    } catch (e: IllegalArgumentException) {
+        Log.d(TAG, "not a base64 string", e)
+    }
+
+    try {
+        BIP39.bytes(WordList.Language.ENGLISH, s)
+    } catch (e: java.lang.IllegalArgumentException) {
+        Log.e(TAG, "not a base64 string or a mnemonic", e)
+    }
+
+    return null
 }
 
 object Logging {
