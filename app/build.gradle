@@ -55,6 +55,7 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
     implementation group: 'com.github.vrischmann', name: 'ulid-java', version: '6bf27f9e8f7418ec8a381c524d5a4c884131271a'
+    implementation group: 'com.github.vrischmann', name: 'bip39-java', version: 'e2b698926f1ef76a85c0700716451ff1a7f3e626'
 
     // android stuff
     implementation 'androidx.appcompat:appcompat:1.1.0'
