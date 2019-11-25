@@ -36,12 +36,12 @@ class CryptoTest {
 
     @Test
     fun signAndVerifyFromGoData() {
-        val privateKey = b64("pkk5Z6hxvQzz8G8Zy+AnoGcHVvZ/ltHU19n2TDEa1ZLzP7buaHE34/RCZ9lV8zduQnbnU9MJz3qYc375k20mtA==").sliceArray(0..31)
-        val publicKey = b64("8z+27mhxN+P0QmfZVfM3bkJ251PTCc96mHN++ZNtJrQ=")
+        val privateKey = b64("fR2YhWSJFev9eLUXpQRYyr9CKL7F6Nsq6+JuF84Vz0w=")
+        val publicKey = b64("bW7CIJBdDTHh5bL5UK7L+AXirOLHQMHSQUi206EoMCI=")
         val message = "hello".toByteArray(charset("UTF-8"))
 
         // Computed with Go's ed25519 generated private key
-        val computedSignature = b64("D3AquVmc/lYcUSXHjXA2BhvXqDBGu+SdWj5uxvtsyg5CKLNaQtJY1axdyLEc25pkloq+e7vZykVkMnnaCXwKAg==")
+        val computedSignature = b64("vlqcAjxbN84QsGYOszauR3y9x1urfHVRjJ/6j67ELgbpUM/HE6rwCQlx1DvZnk1HNgReReLdrHDgfkJMTgSdAA==")
 
         assertTrue(Crypto.verify(publicKey, message, computedSignature))
 
