@@ -165,8 +165,6 @@ class MainActivity : AppCompatActivity(),
         }
         val s = String(plaintext, Charset.defaultCharset()).trim()
 
-        Log.d(TAG, s)
-
         val clipData = ClipData.newPlainText(id.toString(), s)
 
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
