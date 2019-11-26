@@ -91,8 +91,6 @@ class MainActivity : AppCompatActivity(),
             return
         }
 
-        Log.i(TAG, "move item $item")
-
         _vm.moveEntry(item)?.let {
             when (it.status) {
                 is AperoStatus.OK -> {
@@ -120,8 +118,6 @@ class MainActivity : AppCompatActivity(),
             Toast.makeText(applicationContext, getString(R.string.paste_encryption_undefined), Toast.LENGTH_LONG).show()
             return
         }
-
-        Log.i(TAG, "paste item $item")
 
         _vm.pasteEntry(item)?.let {
             when (it.status) {
