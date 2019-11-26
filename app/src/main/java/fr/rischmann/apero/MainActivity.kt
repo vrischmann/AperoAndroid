@@ -265,11 +265,10 @@ private fun parsePreference(pref: String): ByteArray? {
     try {
         return Base64.getDecoder().decode(s)
     } catch (e: IllegalArgumentException) {
-        Log.d(TAG, "not a base64 string", e)
     }
 
     try {
-        BIP39.bytes(WordList.Language.ENGLISH, s)
+        return BIP39.bytes(WordList.Language.ENGLISH, s)
     } catch (e: java.lang.IllegalArgumentException) {
         Log.e(TAG, "not a base64 string or a mnemonic", e)
     }
