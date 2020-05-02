@@ -32,6 +32,22 @@ interface EntryRepository {
     }
 }
 
+class EmptyRepository : EntryRepository {
+    override fun list(): LiveData<AperoResponse<Entries>> {
+        val data = MutableLiveData<AperoResponse<Entries>>()
+        data.value = AperoResponse(emptyList(), AperoStatus.NotFound)
+        return data
+    }
+
+    override fun move(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> {
+        return CompletableFuture.completedFuture(AperoResponse(byteArrayOf(), AperoStatus.NotFound))
+    }
+
+    override fun paste(entry: Entry): CompletableFuture<AperoResponse<ByteArray>> {
+        return CompletableFuture.completedFuture(AperoResponse(byteArrayOf(), AperoStatus.NotFound))
+    }
+}
+
 private class RealEntryRepository(private val client: AperoClient) : EntryRepository {
     override fun list(): LiveData<AperoResponse<Entries>> {
         val data = MutableLiveData<AperoResponse<Entries>>()
