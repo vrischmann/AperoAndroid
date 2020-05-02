@@ -96,12 +96,17 @@ private class RealAperoClient(private val endpoint: String, private val credenti
         // Encrypt the payload with the pre-shared key
         val ciphertext = secretBox.seal(payload, SecretBox.newNonce())
 
-        val req = Request.Builder()
-            .url("$endpoint/api/v1/list")
-            .post(ciphertext.toRequestBody())
-            .build()
-
         val data = AperoCompletableFuture<Entries>()
+
+        val req = try {
+            Request.Builder()
+                .url("$endpoint/api/v1/list")
+                .post(ciphertext.toRequestBody())
+                .build()
+        } catch (e: IllegalArgumentException) {
+            data.complete(AperoResponse(emptyList(), AperoStatus.Error("invalid endpoint $endpoint")))
+            return data
+        }
 
         httpClient.newCall(req).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
