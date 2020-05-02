@@ -7,20 +7,36 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class EntryViewModelFactory(private val client: EntryRepository) : ViewModelProvider.Factory {
+class EntryViewModelFactory(private val initialRepository: EntryRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return EntryViewModel(client) as T
+        return EntryViewModel(initialRepository) as T
     }
 }
 
-class EntryViewModel(private val repository: EntryRepository) : ViewModel() {
-    private val reload = MutableLiveData<Boolean>()
+class RefreshableLiveData<T>(private val source: () -> LiveData<T>) : MediatorLiveData<T>(), Observer<T> {
+    private var liveData: LiveData<T>
 
-    val entries: LiveData<AperoResponse<Entries>> = Transformations.switchMap(reload) {
-        repository.list()
+    init {
+        liveData = source()
+        addSource(liveData, this)
     }
 
+    fun refresh() {
+        removeSource(liveData)
+        liveData = source()
+        addSource(liveData, this)
+    }
+
+    override fun onChanged(t: T) {
+        value = t
+    }
+}
+
+class EntryViewModel(var repository: EntryRepository) : ViewModel() {
+    val entries = RefreshableLiveData {
+        repository.list()
+    }
 
     fun moveEntry(entry: Entry): AperoResponse<ByteArray>? {
         val ld = repository.move(entry)
@@ -51,6 +67,6 @@ class EntryViewModel(private val repository: EntryRepository) : ViewModel() {
     }
 
     fun reloadEntries() {
-        reload.value = true
+        entries.refresh()
     }
 }

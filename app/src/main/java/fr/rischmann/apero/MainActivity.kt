@@ -43,7 +43,10 @@ class MainActivity : AppCompatActivity(),
         //
 
         createRepositoryFromPrefs()
-        createViewModel()
+
+        val vmFactory = EntryViewModelFactory(EmptyRepository())
+        _vm = ViewModelProviders.of(this, vmFactory)[EntryViewModel::class.java]
+        _vm.repository = _repository
 
         //
 
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity(),
         super.onResume()
 
         createRepositoryFromPrefs()
-        createViewModel()
+        _vm.repository = _repository
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -147,10 +150,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun createViewModel() {
-        viewModelStore.clear()
-
-        val vmFactory = EntryViewModelFactory(_repository)
-        _vm = ViewModelProviders.of(this, vmFactory)[EntryViewModel::class.java]
     }
 
     private fun copyItemToClipboard(id: ULID, data: ByteArray) {
